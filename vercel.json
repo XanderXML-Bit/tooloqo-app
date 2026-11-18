@@ -1,0 +1,103 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm ci",
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/image",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/image/resize",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/image/compress",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/image/crop",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/image/convert",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/image/rotate",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/pdf",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/pdf/merge",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/pdf/split",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/pdf/compress",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/pdf/image-to-pdf",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/pdf/pdf-to-image",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/media",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/media/audio-convert",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/media/video-compress",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/media/video-to-gif",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/media/extract-audio",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/text",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/text/word-count",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/text/case-convert",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/text/text-compare",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/settings",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/index.html"
+    }
+  ]
+}

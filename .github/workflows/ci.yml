@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      matrix:
+        node-version: [22.x, 24.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Run tests
+        run: npm run test -- --run
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify default built metadata names the branded host
+        run: node scripts/verify-built-origin.mjs https://tooloqo.zendren.net
+
+      - name: Verify origin override
+        run: |
+          VITE_SITE_URL=https://tooloqo.vercel.app npm run build
+          node scripts/verify-built-origin.mjs https://tooloqo.vercel.app
+
+      - name: Restore default production artifact
+        run: npm run build
+
+      - name: Install headless Chromium
+        if: matrix.node-version == '22.x'
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify media tools and audit fixes in a fresh browser
+        if: matrix.node-version == '22.x'
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4178 > preview.log 2>&1 &
+          PREVIEW_PID=$!
+          trap 'kill "$PREVIEW_PID"' EXIT
+          for attempt in $(seq 1 30); do
+            curl --fail --silent http://127.0.0.1:4178/ > /dev/null && break
+            sleep 1
+          done
+          node scripts/verify-media-browser.mjs
+          node scripts/verify-skip-link.mjs
+          node scripts/verify-defects-browser.mjs
+
+      - name: Upload media browser evidence
+        if: always() && matrix.node-version == '22.x'
+        uses: actions/upload-artifact@v4
+        with:
+          name: media-browser-evidence
+          path: |
+            test-results/media
+            test-results/skip-link
+            test-results/defects
+          retention-days: 7
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        if: matrix.node-version == '22.x'
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
+
+  deploy-preview:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      # Add Vercel preview deployment here when configured
+      # - name: Deploy to Vercel Preview
+      #   uses: amondnet/vercel-action@v25
+      #   with:
+      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
+      #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  deploy-production:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      # Add Vercel production deployment here when configured
+      # - name: Deploy to Vercel Production
+      #   uses: amondnet/vercel-action@v25
+      #   with:
+      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
+      #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+      #     vercel-args: '--prod'

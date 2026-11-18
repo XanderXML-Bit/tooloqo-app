@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 184 40" fill="none" role="img" aria-label="Tooloqo">
+  <title>Tooloqo</title>
+  <defs><linearGradient id="tq" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#599dff"/><stop offset="1" stop-color="#3378ff"/></linearGradient></defs>
+  <g transform="translate(4 4)">
+  <rect x="2" y="18" width="12" height="12" rx="2.5" fill="url(#tq)"/>
+  <rect x="18" y="18" width="12" height="12" rx="2.5" fill="url(#tq)"/>
+  <rect x="2" y="2" width="12" height="12" rx="2.5" fill="url(#tq)"/>
+  <rect x="18" y="2" width="10" height="10" rx="2" fill="url(#tq)" transform="rotate(45 23 7)"/>
+  </g>
+  <text x="46" y="29" font-family="'Space Grotesk', system-ui, sans-serif" font-size="26" font-weight="600" letter-spacing="-0.5" fill="#3378ff">Tooloqo</text>
+</svg>
