@@ -65,12 +65,20 @@ try {
       const focused = await page.evaluate(() => ({ tag: document.activeElement?.tagName, id: document.activeElement?.id, hash: location.hash }));
       assert.deepEqual(focused, { tag: 'MAIN', id: 'main', hash: '' }, `${label}: Enter did not focus <main id="main">`);
 
-      const footerLinks = await page.locator('footer a').evaluateAll((els) =>
-        els.map((el) => { const r = el.getBoundingClientRect(); return { text: el.textContent, top: Math.round(r.top), h: r.height }; }));
-      assert.equal(footerLinks.length, 3, `${label}: footer link count`);
-      for (const link of footerLinks) assert(link.h >= 44, `${label}: footer link ${link.text} is ${link.h}px tall`);
+      const footerLinks = await page.locator('footer a').evaluateAll((links) =>
+        links.map((link) => {
+          const { top, width, height } = link.getBoundingClientRect();
+          return { text: link.textContent, top: Math.round(top), width, height };
+        }));
+      assert.equal(footerLinks.length, 2, `${label}: footer link count`);
+      for (const link of footerLinks) {
+        assert(
+          link.width >= 44 && link.height >= 44,
+          `${label}: footer link ${link.text} is ${link.width} × ${link.height}px`,
+        );
+      }
       const footerRows = new Set(footerLinks.map((l) => l.top)).size;
-      assert.equal(footerRows, 2, `${label}: footer link rows`);
+      assert.equal(footerRows, 1, `${label}: footer link rows`);
 
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${label}: horizontal overflow`);
       const violations = await scan(page);

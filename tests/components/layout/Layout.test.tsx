@@ -135,7 +135,7 @@ describe('Layout', () => {
     const main = screen.getByRole('main');
     expect(main.className).toContain('min-h-0');
     expect(main.className).toContain('overflow-y-auto');
-    expect(main.querySelector('footer a[rel="author"]')).not.toBeNull();
+    expect(main.querySelector('footer a[href="https://zendren.net"]')).not.toBeNull();
   });
 });
 

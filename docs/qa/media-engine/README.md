@@ -52,7 +52,8 @@ GitHub Actions runs the browser regression on Node 22. Ubuntu 24.04 matches Play
 
 ## Inspect the captures
 
-"Before" captures show the earlier build. "After" captures use the production build with these repairs.
+"Before" captures show the earlier build. "After" captures show the build with these repairs.
+Both sets were recaptured with Zendren attribution.
 
 The following links contain all four routes at all three requested widths. WebP copies use quality 90.
 

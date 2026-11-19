@@ -5,6 +5,11 @@ import { buildRobotsTxt, buildSitemapXml } from './src/lib/crawl';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// Keep Vercel's commit and repository metadata out of the browser bundle.
+for (const key of Object.keys(process.env)) {
+  if (key.startsWith('VITE_VERCEL_')) delete process.env[key];
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   const siteOrigin = resolveSiteOrigin(env.VITE_SITE_URL);
