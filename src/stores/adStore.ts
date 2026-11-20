@@ -25,9 +25,7 @@ export const useAdStore = create<AdStoreState>()(
       setAdFree: (value: boolean) => set({ adFree: value }),
 
       restorePurchase: async () => {
-        // TODO: Integrate with RevenueCat/payment provider for purchase restoration
-        // This is a placeholder for the actual implementation
-        // Restore purchase - to be implemented with payment provider
+        // No entitlement is restored yet. See GitHub issue #2.
       },
     }),
     {

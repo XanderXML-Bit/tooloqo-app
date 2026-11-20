@@ -21,8 +21,7 @@ export function AdFree() {
   const { adFree, setAdFree, restorePurchase } = useAdStore();
 
   const handlePurchase = () => {
-    // TODO: Integrate with RevenueCat/payment provider
-    // For development, toggle the state
+    // Local preview only; no payment is processed. See GitHub issue #2.
     setAdFree(true);
   };
 
