@@ -14,26 +14,17 @@ export function SiteFooter({ className }: { className?: string }) {
         className
       )}
     >
-      <p>
-        © {year} Zendren · Built by{' '}
-        <a
-          href="https://xandermlopez.com"
-          rel="author"
-          className="inline-flex min-h-[44px] items-center align-middle underline underline-offset-2 hover:text-text-primary"
-        >
-          Xander M. Lopez
-        </a>
-      </p>
+      <p>© {year} Zendren</p>
       <p className="mt-2 flex items-center justify-center gap-4">
         <a
           href="https://zendren.net"
-          className="inline-flex min-h-[44px] items-center align-middle underline underline-offset-2 hover:text-text-primary"
+          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center underline underline-offset-2 hover:text-text-primary"
         >
           zendren.net
         </a>
         <Link
           to="/privacy"
-          className="inline-flex min-h-[44px] items-center align-middle underline underline-offset-2 hover:text-text-primary"
+          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center underline underline-offset-2 hover:text-text-primary"
         >
           Privacy
         </Link>

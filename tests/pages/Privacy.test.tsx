@@ -11,7 +11,6 @@ const root = path.resolve(__dirname, '../..');
 const LINK_ONLY_HOSTS = new Set([
   'tooloqo.zendren.net',
   'zendren.net',
-  'xandermlopez.com',
   'admob.google.com',
   'www.w3.org',
   'www.sitemaps.org',
@@ -52,6 +51,14 @@ describe('Privacy', () => {
     renderPage();
     expect(screen.getByRole('heading', { name: 'How Tooloqo handles your files' })).toBeInTheDocument();
     expect(screen.getByText(/never uploaded to a server/)).toBeInTheDocument();
+  });
+
+  it('names the operator and links to its contact email', () => {
+    expect(renderPage()).toContain('Zendren LLC operates Tooloqo.');
+    expect(screen.getByRole('link', { name: 'hello@zendren.net' })).toHaveAttribute(
+      'href',
+      'mailto:hello@zendren.net',
+    );
   });
 
   it('names every third-party host the source can contact', () => {

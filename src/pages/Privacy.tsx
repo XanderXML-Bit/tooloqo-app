@@ -44,11 +44,11 @@ export function Privacy() {
         </p>
         <h3 className="text-base font-semibold text-text-primary">Contact</h3>
         <p>
-          Tooloqo is built by Zendren. Questions:{' '}
-          <a href="https://zendren.net" className="underline underline-offset-2 text-text-primary">
-            zendren.net
+          Zendren LLC operates Tooloqo. Email{' '}
+          <a href="mailto:hello@zendren.net" className="underline underline-offset-2 text-text-primary">
+            hello@zendren.net
           </a>
-          .
+          {' '}with questions.
         </p>
       </article>
     </Layout>

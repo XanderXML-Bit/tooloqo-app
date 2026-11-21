@@ -29,13 +29,17 @@ describe('vercel.json routing', () => {
     expect(sources).not.toContain('/ad-free');
   });
 
-  it('ships a styled static 404 page with the footer attribution', () => {
+  it('ships a styled static 404 page with the Zendren copyright and links', () => {
     const page = resolve(root, 'public/404.html');
     expect(existsSync(page)).toBe(true);
     const html = readFileSync(page, 'utf8');
     expect(html).toContain('Page not found');
-    expect(html).toContain('rel="author"');
-    expect(html).toContain('https://zendren.net');
+    const footer = html.match(/<footer>([\s\S]*?)<\/footer>/)?.[1] ?? '';
+    expect(footer).toMatch(/<p>© <span id="y">\d{4}<\/span> Zendren<\/p>/);
+    expect(Array.from(footer.matchAll(/href="([^"]+)"/g), ([, href]) => href)).toEqual([
+      'https://zendren.net',
+      '/privacy',
+    ]);
   });
 
   it('installs from the lockfile', () => {
