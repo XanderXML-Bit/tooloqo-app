@@ -8,7 +8,6 @@ export const APP_NAME = 'Tooloqo';
 export const APP_VERSION = '0.1.0';
 export const APP_ID = 'com.tooloqo.app';
 export const APP_DESCRIPTION = 'Unified utility toolkit for image, PDF, media, and file conversion';
-export const SUPPORT_EMAIL = 'support@tooloqo.app';
 
 // Storage keys
 export const STORAGE_KEYS = {
