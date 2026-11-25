@@ -31,24 +31,18 @@ jobs:
         run: npm run lint
 
       - name: Type check
-        run: npx tsc --noEmit
+        run: npx tsc -b
 
       - name: Run tests
         run: npm run test -- --run
 
-      - name: Build
+      - name: Build for the canonical origin
+        env:
+          VITE_SITE_URL: https://tooloqo.zendren.net
         run: npm run build
 
-      - name: Verify default built metadata names the branded host
+      - name: Verify built metadata names the canonical origin
         run: node scripts/verify-built-origin.mjs https://tooloqo.zendren.net
-
-      - name: Verify origin override
-        run: |
-          VITE_SITE_URL=https://tooloqo.vercel.app npm run build
-          node scripts/verify-built-origin.mjs https://tooloqo.vercel.app
-
-      - name: Restore default production artifact
-        run: npm run build
 
       - name: Install headless Chromium
         if: matrix.node-version == '22.x'

@@ -1,7 +1,6 @@
 /// <reference types="vite/client" />
 
 /** Production origin for canonical/share URLs (never a preview deployment). */
-// tooloqo.vercel.app stays a served alias (no redirect); metadata names the branded host unless VITE_SITE_URL overrides it.
 export function resolveSiteOrigin(value?: string): string {
   const url = new URL(value?.trim() || 'https://tooloqo.zendren.net');
   if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password ||

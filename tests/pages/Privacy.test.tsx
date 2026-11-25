@@ -14,7 +14,6 @@ const LINK_ONLY_HOSTS = new Set([
   'admob.google.com',
   'www.w3.org',
   'www.sitemaps.org',
-  'tooloqo.vercel.app',
 ]);
 
 function sourceFiles(dir: string): string[] {

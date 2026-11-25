@@ -14,7 +14,7 @@ describe('configured site origin', () => {
   });
 
   it('normalizes whitespace and a trailing slash', () => {
-    expect(resolveSiteOrigin(' https://tooloqo.vercel.app/ ')).toBe('https://tooloqo.vercel.app');
+    expect(resolveSiteOrigin(' https://example.com/ ')).toBe('https://example.com');
   });
 
   it.each([
@@ -24,7 +24,7 @@ describe('configured site origin', () => {
     expect(() => resolveSiteOrigin(value)).toThrow();
   });
 
-  it('honors a build-time origin override', async () => {
+  it('uses the served alias when explicitly configured', async () => {
     vi.stubEnv('VITE_SITE_URL', 'https://tooloqo.vercel.app/');
     vi.resetModules();
     const module = await import('../../src/lib/site');
