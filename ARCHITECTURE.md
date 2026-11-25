@@ -10,6 +10,7 @@ This document provides a comprehensive technical overview of Tooloqo's architect
 ## Table of Contents
 
 1. [App Overview](#app-overview)
+   - [Configure native ads](#configure-native-ads)
 2. [Project Structure](#project-structure)
 3. [Application Flow](#application-flow)
 4. [State Management](#state-management)
