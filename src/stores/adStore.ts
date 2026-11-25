@@ -25,7 +25,7 @@ export const useAdStore = create<AdStoreState>()(
       setAdFree: (value: boolean) => set({ adFree: value }),
 
       restorePurchase: async () => {
-        // No entitlement is restored yet. See GitHub issue #2.
+        // RevenueCat purchase and restore are tracked in issue #2.
       },
     }),
     {
