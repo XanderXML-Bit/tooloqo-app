@@ -13,7 +13,6 @@ const LINK_ONLY_HOSTS = new Set([
   'zendren.net',
   'www.w3.org',
   'www.sitemaps.org',
-  'tooloqo.vercel.app',
 ]);
 
 function sourceFiles(dir: string): string[] {
