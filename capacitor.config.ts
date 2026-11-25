@@ -1,4 +1,15 @@
 import type { CapacitorConfig } from '@capacitor/cli';
+import { loadEnv } from 'vite';
+import { readAdIds } from './src/config/adIds.ts';
+
+const adEnv = loadEnv('production', process.cwd(), 'VITE_ADMOB_');
+const basePlugins = ['@capacitor/filesystem', '@capacitor/share'];
+
+function pluginsFor(platform: 'android' | 'ios') {
+  return readAdIds(adEnv, platform)
+    ? [...basePlugins, '@capacitor-community/admob']
+    : basePlugins;
+}
 
 const config: CapacitorConfig = {
   appId: 'app.tooloqo',
@@ -28,9 +39,11 @@ const config: CapacitorConfig = {
     },
   },
   ios: {
+    includePlugins: pluginsFor('ios'),
     contentInset: 'automatic',
   },
   android: {
+    includePlugins: pluginsFor('android'),
     allowMixedContent: true,
   },
 };

@@ -21,7 +21,7 @@ export function AdFree() {
   const { adFree, setAdFree, restorePurchase } = useAdStore();
 
   const handlePurchase = () => {
-    // Local preview only; no payment is processed. See GitHub issue #2.
+    // The preview records ad-free status in local storage.
     setAdFree(true);
   };
 
