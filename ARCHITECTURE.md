@@ -33,6 +33,14 @@ Tooloqo is a **unified utility toolkit** that consolidates image, PDF, text, and
 
 ---
 
+## Configure native ads
+
+Native ads are optional. Copy [`.env.example`](.env.example) to `.env.local`. Set the app ID, banner ID, and interstitial ID for each platform where you want ads.
+If any ID is missing, Capacitor leaves AdMob out of that platform's build. The app also skips SDK initialization. The web app runs without ads.
+
+Set the matching app ID in the native project for each platform you enable. Use `AndroidManifest.xml` for Android and `Info.plist` for iOS. Follow the [Capacitor AdMob setup guide](https://github.com/capacitor-community/admob/tree/v8.0.0#android-configuration) for the other native settings.
+Run `npm run build`, then `npm run cap:sync`. With all IDs set, development builds use Google's test ad units.
+
 ## Project Structure
 
 ```

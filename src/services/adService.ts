@@ -14,8 +14,9 @@
  * - Call showInterstitialAfterOperation() after completing a tool operation
  */
 
-import { Capacitor } from '@capacitor/core';
-import { getAdUnitId, isAdSupported, isUsingTestAds } from '@/config/ads';
+import { getAdConfig } from '@/config/ads';
+
+const adConfig = getAdConfig();
 
 // ============================================================================
 // DYNAMIC IMPORT - Prevents web build crashes
@@ -49,7 +50,7 @@ let BannerAdPosition: AdMobBannerAdPosition = {} as AdMobBannerAdPosition;
 // Promise that resolves when AdMob module is loaded
 let admobModuleLoaded: Promise<boolean>;
 
-if (Capacitor.isNativePlatform()) {
+if (adConfig) {
   admobModuleLoaded = import('@capacitor-community/admob')
     .then((module) => {
       AdMob = module.AdMob as unknown as AdMobPlugin;
@@ -93,7 +94,6 @@ export async function initializeAds(): Promise<boolean> {
 
   const moduleLoaded = await admobModuleLoaded;
   if (!moduleLoaded || !AdMob) {
-    if (import.meta.env.DEV) console.log('[Ads] Not supported on this platform');
     return false;
   }
 
@@ -129,7 +129,7 @@ export async function initializeAds(): Promise<boolean> {
  * Check if ads are initialized and available
  */
 export function isAdsAvailable(): boolean {
-  return adsInitialized && isAdSupported();
+  return adsInitialized;
 }
 
 // ============================================================================
@@ -140,13 +140,13 @@ export function isAdsAvailable(): boolean {
  * Show the banner ad at the bottom of the screen
  */
 export async function showBannerAd(): Promise<boolean> {
-  if (!AdMob || !adsInitialized) return false;
+  if (!AdMob || !adsInitialized || !adConfig) return false;
   if (bannerVisible) return true;
 
   try {
     if (!bannerCreated) {
       await AdMob.showBanner({
-        adId: getAdUnitId('banner'),
+        adId: adConfig.banner,
         adSize: BannerAdSize.ADAPTIVE_BANNER,
         position: BannerAdPosition.BOTTOM_CENTER,
         margin: 0,
@@ -230,13 +230,13 @@ export async function showInterstitialAfterOperation(): Promise<boolean> {
     return false;
   }
 
-  if (!AdMob || !adsInitialized) {
+  if (!AdMob || !adsInitialized || !adConfig) {
     return false;
   }
 
   try {
     await AdMob.prepareInterstitial({
-      adId: getAdUnitId('interstitial'),
+      adId: adConfig.interstitial,
       isTesting: isUsingTestAds(),
     });
 
@@ -259,11 +259,11 @@ export async function showInterstitialAfterOperation(): Promise<boolean> {
  * Use sparingly - only for specific scenarios like before export
  */
 export async function forceShowInterstitial(): Promise<boolean> {
-  if (!AdMob || !adsInitialized) return false;
+  if (!AdMob || !adsInitialized || !adConfig) return false;
 
   try {
     await AdMob.prepareInterstitial({
-      adId: getAdUnitId('interstitial'),
+      adId: adConfig.interstitial,
       isTesting: isUsingTestAds(),
     });
 
@@ -287,7 +287,7 @@ export async function forceShowInterstitial(): Promise<boolean> {
  * Returns 0 on web or when ads not supported
  */
 export function getBannerHeight(): number {
-  if (!isAdSupported()) return 0;
+  if (!adConfig) return 0;
   // Adaptive banner is typically 50-90px, use 60 as safe default
   return 60;
 }
@@ -296,4 +296,10 @@ export function getBannerHeight(): number {
 // EXPORTS
 // ============================================================================
 
-export { isAdSupported, isUsingTestAds };
+export function isAdSupported(): boolean {
+  return adConfig !== null;
+}
+
+export function isUsingTestAds(): boolean {
+  return adConfig?.testing ?? false;
+}

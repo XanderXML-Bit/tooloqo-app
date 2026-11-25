@@ -1,101 +1,144 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { Capacitor } from '@capacitor/core';
 
-// Mock Capacitor before importing
 vi.mock('@capacitor/core', () => ({
   Capacitor: {
-    isNativePlatform: vi.fn(() => false),
-    getPlatform: vi.fn(() => 'web'),
+    isNativePlatform: vi.fn(),
+    getPlatform: vi.fn(),
   },
 }));
 
-vi.mock('@/config/ads', () => ({
-  getAdUnitId: vi.fn(() => 'test-ad-id'),
-  isAdSupported: vi.fn(() => false),
-  isUsingTestAds: vi.fn(() => true),
+const adMob = {
+  initialize: vi.fn().mockResolvedValue(undefined),
+  requestTrackingAuthorization: vi.fn().mockResolvedValue(undefined),
+  showBanner: vi.fn().mockResolvedValue(undefined),
+  prepareInterstitial: vi.fn().mockResolvedValue(undefined),
+  showInterstitial: vi.fn().mockResolvedValue(undefined),
+};
+
+const loadPlugin = vi.fn(() => ({
+  AdMob: adMob,
+  BannerAdSize: { ADAPTIVE_BANNER: 'adaptive' },
+  BannerAdPosition: { BOTTOM_CENTER: 'bottom' },
 }));
 
-describe('adService', () => {
-  beforeEach(() => {
-    vi.resetModules();
-  });
+const adIds = {
+  VITE_ADMOB_ANDROID_APP_ID: 'android-app',
+  VITE_ADMOB_ANDROID_BANNER_ID: 'android-banner',
+  VITE_ADMOB_ANDROID_INTERSTITIAL_ID: 'android-interstitial',
+  VITE_ADMOB_IOS_APP_ID: 'ios-app',
+  VITE_ADMOB_IOS_BANNER_ID: 'ios-banner',
+  VITE_ADMOB_IOS_INTERSTITIAL_ID: 'ios-interstitial',
+};
 
-  it('exports expected functions', async () => {
-    const adService = await import('../../src/services/adService');
-    expect(adService.initializeAds).toBeDefined();
-    expect(adService.isAdsAvailable).toBeDefined();
-    expect(adService.showBannerAd).toBeDefined();
-    expect(adService.hideBannerAd).toBeDefined();
-    expect(adService.removeBannerAd).toBeDefined();
-    expect(adService.isBannerVisible).toBeDefined();
-    expect(adService.showInterstitialAfterOperation).toBeDefined();
-    expect(adService.forceShowInterstitial).toBeDefined();
-    expect(adService.getBannerHeight).toBeDefined();
-  });
+function setPlatform(platform: 'ios' | 'android' | 'web') {
+  vi.mocked(Capacitor.getPlatform).mockReturnValue(platform);
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(platform !== 'web');
+}
 
-  it('isAdsAvailable returns false on web', async () => {
-    const { isAdsAvailable } = await import('../../src/services/adService');
-    expect(isAdsAvailable()).toBe(false);
-  });
+function setAdIds() {
+  for (const [key, value] of Object.entries(adIds)) vi.stubEnv(key, value);
+}
 
-  it('isBannerVisible returns false initially', async () => {
-    const { isBannerVisible } = await import('../../src/services/adService');
-    expect(isBannerVisible()).toBe(false);
-  });
-
-  it('getBannerHeight returns 0 on web', async () => {
-    const { getBannerHeight } = await import('../../src/services/adService');
-    expect(getBannerHeight()).toBe(0);
-  });
-
-  it('initializeAds returns false on web (no AdMob)', async () => {
-    const { initializeAds } = await import('../../src/services/adService');
-    const result = await initializeAds();
-    expect(result).toBe(false);
-  });
-
-  it('showBannerAd returns false when not initialized', async () => {
-    const { showBannerAd } = await import('../../src/services/adService');
-    const result = await showBannerAd();
-    expect(result).toBe(false);
-  });
-
-  it('hideBannerAd is safe to call when not initialized', async () => {
-    const { hideBannerAd } = await import('../../src/services/adService');
-    await expect(hideBannerAd()).resolves.toBeUndefined();
-  });
-
-  it('removeBannerAd is safe to call when not initialized', async () => {
-    const { removeBannerAd } = await import('../../src/services/adService');
-    await expect(removeBannerAd()).resolves.toBeUndefined();
-  });
-
-  it('showInterstitialAfterOperation returns false when not initialized', async () => {
-    const { showInterstitialAfterOperation } = await import('../../src/services/adService');
-    const result = await showInterstitialAfterOperation();
-    expect(result).toBe(false);
-  });
-
-  it('forceShowInterstitial returns false when not initialized', async () => {
-    const { forceShowInterstitial } = await import('../../src/services/adService');
-    const result = await forceShowInterstitial();
-    expect(result).toBe(false);
-  });
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.resetModules();
+  vi.doMock('@capacitor-community/admob', loadPlugin);
+  for (const key of Object.keys(adIds)) vi.stubEnv(key, undefined);
+  vi.stubEnv('DEV', false);
 });
 
-describe('ads config', () => {
-  it('getAdUnitId returns test IDs on web', async () => {
-    const { getAdUnitId } = await import('../../src/config/ads');
-    expect(getAdUnitId('banner')).toBeDefined();
-    expect(typeof getAdUnitId('banner')).toBe('string');
+afterEach(() => {
+  vi.doUnmock('@capacitor-community/admob');
+  vi.unstubAllEnvs();
+});
+
+describe('adService', () => {
+  it.each([
+    { platform: 'android', development: false },
+    { platform: 'ios', development: false },
+    { platform: 'android', development: true },
+  ] as const)('skips AdMob on unconfigured $platform (development: $development)', async ({
+    platform,
+    development,
+  }) => {
+    setPlatform(platform);
+    vi.stubEnv('DEV', development);
+    const ads = await import('@/services/adService');
+
+    await expect(ads.initializeAds()).resolves.toBe(false);
+    await expect(ads.showBannerAd()).resolves.toBe(false);
+    await expect(ads.hideBannerAd()).resolves.toBeUndefined();
+    await expect(ads.removeBannerAd()).resolves.toBeUndefined();
+    await expect(ads.forceShowInterstitial()).resolves.toBe(false);
+    for (let operation = 0; operation < 3; operation++) {
+      await expect(ads.showInterstitialAfterOperation()).resolves.toBe(false);
+    }
+
+    expect(ads.isAdsAvailable()).toBe(false);
+    expect(ads.isBannerVisible()).toBe(false);
+    expect(ads.getBannerHeight()).toBe(0);
+    await vi.dynamicImportSettled();
+    expect(loadPlugin).not.toHaveBeenCalled();
   });
 
-  it('isAdSupported returns boolean', async () => {
-    const { isAdSupported } = await import('../../src/config/ads');
-    expect(typeof isAdSupported()).toBe('boolean');
+  it('skips the AdMob plugin on the web even with native IDs configured', async () => {
+    setPlatform('web');
+    setAdIds();
+    const ads = await import('@/services/adService');
+
+    await expect(ads.initializeAds()).resolves.toBe(false);
+    expect(ads.getBannerHeight()).toBe(0);
+    await vi.dynamicImportSettled();
+    expect(loadPlugin).not.toHaveBeenCalled();
   });
 
-  it('isUsingTestAds returns boolean', async () => {
-    const { isUsingTestAds } = await import('../../src/config/ads');
-    expect(typeof isUsingTestAds()).toBe('boolean');
+  it.each(['APP_ID', 'BANNER_ID', 'INTERSTITIAL_ID'])('skips ads when Android %s is blank', async (id) => {
+    setPlatform('android');
+    setAdIds();
+    vi.stubEnv(`VITE_ADMOB_ANDROID_${id}`, '   ');
+    const ads = await import('@/services/adService');
+
+    await expect(ads.initializeAds()).resolves.toBe(false);
+    await vi.dynamicImportSettled();
+    expect(loadPlugin).not.toHaveBeenCalled();
+  });
+
+  it.each(['android', 'ios'] as const)('uses the configured %s IDs in production', async (platform) => {
+    setPlatform(platform);
+    setAdIds();
+    const ads = await import('@/services/adService');
+
+    await expect(ads.initializeAds()).resolves.toBe(true);
+    expect(ads.isAdsAvailable()).toBe(true);
+    expect(adMob.initialize).toHaveBeenCalledWith({ initializeForTesting: false });
+    await expect(ads.showBannerAd()).resolves.toBe(true);
+    expect(adMob.showBanner).toHaveBeenCalledWith(expect.objectContaining({
+      adId: `${platform}-banner`,
+      isTesting: false,
+    }));
+    await expect(ads.showInterstitialAfterOperation()).resolves.toBe(false);
+    await expect(ads.showInterstitialAfterOperation()).resolves.toBe(false);
+    await expect(ads.showInterstitialAfterOperation()).resolves.toBe(true);
+    expect(adMob.prepareInterstitial).toHaveBeenCalledWith({
+      adId: `${platform}-interstitial`,
+      isTesting: false,
+    });
+    expect(adMob.showInterstitial).toHaveBeenCalledOnce();
+  });
+
+  it('uses Google test units in configured development builds', async () => {
+    setPlatform('android');
+    setAdIds();
+    vi.stubEnv('DEV', true);
+    const ads = await import('@/services/adService');
+
+    await expect(ads.initializeAds()).resolves.toBe(true);
+    expect(adMob.initialize).toHaveBeenCalledWith({ initializeForTesting: true });
+    await expect(ads.showBannerAd()).resolves.toBe(true);
+    expect(adMob.showBanner).toHaveBeenCalledWith(expect.objectContaining({
+      adId: 'ca-app-pub-3940256099942544/6300978111',
+      isTesting: true,
+    }));
   });
 });

@@ -11,7 +11,6 @@ const root = path.resolve(__dirname, '../..');
 const LINK_ONLY_HOSTS = new Set([
   'tooloqo.zendren.net',
   'zendren.net',
-  'admob.google.com',
   'www.w3.org',
   'www.sitemaps.org',
   'tooloqo.vercel.app',
