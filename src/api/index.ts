@@ -10,9 +10,12 @@ import { AppBridge } from './AppBridge';
 
 export const bridge = AppBridge.getInstance();
 
+declare global {
+  interface Window {
+    __TOOLOQO?: AppBridge;
+  }
+}
+
 if (typeof window !== 'undefined' && import.meta.env?.DEV) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).__APP_BRIDGE = bridge;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).__TOOLOQO = bridge;
+  window.__TOOLOQO = bridge;
 }

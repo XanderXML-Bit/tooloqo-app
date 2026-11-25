@@ -14,6 +14,12 @@ Tooloqo is a free browser toolkit for anyone who needs to edit images, PDFs, aud
 
 <div align="center">
 
+<img src="docs/screenshots/image-compression.webp" alt="Tooloqo image compression showing the original upload beside the compressed result and its Download button" width="880">
+
+</div>
+
+<div align="center">
+
 <img src="docs/screenshots/home.webp" alt="Tooloqo on a phone with Image, PDF, Text, and Media categories" width="300"> <img src="docs/screenshots/home-desktop.webp" alt="Tooloqo home screen on a desktop browser" width="520">
 
 </div>
@@ -39,6 +45,8 @@ npm run dev
 ```
 
 Open [the local app](http://localhost:3000). For a production build, run `npm run build`, then `npm run preview`.
+
+The development bridge exposes one browser alias, `window.__TOOLOQO`. To register it, run `await import('/src/api/index.ts')` in the browser console.
 
 ## Run checks
 
